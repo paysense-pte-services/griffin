@@ -6,7 +6,7 @@ from griffin.griffin.decorators import singleton
 from .config import ENTITY_NAME, ENV, REGION, SERVICE_NAME, HASHICORP_URL, AWS_INSTANCE, VAULT_TOKEN, MOUNT_POINT, KEY
 from .exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException
 
-LOGGER = logging.getLogger("secret_exception_util")
+LOGGER = logging.getLogger("secret_management_util")
 
 
 @singleton
@@ -19,7 +19,7 @@ class SecretManagementUtil:
     @staticmethod
     def _validate_values_from_input(entity_name, service_name):
         if not (entity_name or service_name):
-            raise ValidationFailedException("Validation failed.")
+            raise ValidationFailedException("Validation failed. Please pass required values")
 
     @staticmethod
     def _get_keypath_from_input(secret_key):
@@ -37,10 +37,12 @@ class SecretManagementUtil:
                 LOGGER.info("Vault authentication successful for service:{}".format(SERVICE_NAME))
                 return vault_client
             else:
-                LOGGER.error("Vault authentication failed for service:{}".format(SERVICE_NAME))
                 raise VaultAuthenticationException("Vault authentication failed.")
         except Exception as e:
-            LOGGER.error("Failed to authenticate for service:{} with error:{}".format(SERVICE_NAME, e))
+            msg = "Failed to connect to vault for service: {service} with error:{e}".format(
+                service=SERVICE_NAME, e=str(e)
+            )
+            LOGGER.exception(msg)
             raise VaultAuthenticationException(e)
 
     def get_secret_from_vault(self, secret_key):
@@ -51,7 +53,8 @@ class SecretManagementUtil:
             secret_response = (vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
             return secret_response["data"]["data"][KEY]
         except Exception as e:
-            LOGGER.error("Failed to fetch secret for service:{} having secret_key:{} with error:{}".format(SERVICE_NAME, secret_key, e))
-            raise SecretNotFoundException(e)
-
-
+            msg = "Failed to fetch secret for service: {service} having secret_key: {secret_key} with error:{e}".format(
+                service=SERVICE_NAME, secret_key=secret_key, e=str(e)
+            )
+            LOGGER.exception(msg)
+            raise SecretNotFoundException(msg)
