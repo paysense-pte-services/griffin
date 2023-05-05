@@ -9,5 +9,5 @@ setup(
     author_email='supritha.krishnappa@payufin.com, ritik.jain@payufin.com',
     packages=['griffin'],
     zip_safe=False,
-    install_requires=['hvac==1.1.0']
+    install_requires=['hvac==1.1.0', 'redis==4.5.4']
 )
