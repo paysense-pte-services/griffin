@@ -11,9 +11,6 @@ SERVICE_NAME = os.environ.get("SERVICE_NAME")
 KEY = "current"
 MOUNT_POINT = "payu"
 
-# url of hashicorp to get the secret token
-HASHICORP_URL = "https://hvault-common-cluster.payufin.io"
-
 # aws instance ec2
 AWS_INSTANCE = "ec2"
 
