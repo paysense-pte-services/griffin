@@ -3,6 +3,7 @@ from enum import Enum
 
 class EntityType(Enum):
     PAYUFIN = "payufin"
-    PAYSENSE = "paysense-pte"
+    PAYSENSE = "paysense"
+    PAYSENSE_PTE = "paysense-pte"
     LAZYPAY = "lazypay"
     LAZYCARD = "lazycard"
