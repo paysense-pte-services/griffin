@@ -1,4 +1,4 @@
-from griffin.griffin.config import AWS_INSTANCE, ENTITY_NAME, ENV, REGION, SERVICE_NAME
+from griffin.config import AWS_INSTANCE, ENTITY_NAME, ENV, REGION, SERVICE_NAME
 
 
 def get_keypath_from_input(secret_key):
