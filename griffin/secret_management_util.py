@@ -2,12 +2,12 @@ import logging
 
 import hvac
 
-from griffin.griffin.decorators import singleton
-from griffin.griffin.choices import EntityType
-from griffin.griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY
-from griffin.griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
+from griffin.decorators import singleton
+from griffin.choices import EntityType
+from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY
+from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
     VaultConnectivityException
-from griffin.griffin.utils import get_keypath_from_input, get_hashicorp_url_based_on_env
+from griffin.utils import get_keypath_from_input, get_hashicorp_url_based_on_env
 
 LOGGER = logging.getLogger("secret_management_util")
 
