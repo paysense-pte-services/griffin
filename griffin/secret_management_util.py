@@ -60,8 +60,7 @@ class SecretManagementUtil:
             LOGGER.error(f"Exception occurred while getting secret from cache - {str(e)}")
 
         try:
-            # secret = self.get_secret_from_vault(secret_key)
-            secret = 'kio'
+            secret = self.get_secret_from_vault(secret_key)
             self.set_secret_to_cache(secret_key, secret)
             return secret
         except Exception as e:
