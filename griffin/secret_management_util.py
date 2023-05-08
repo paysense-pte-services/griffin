@@ -6,7 +6,7 @@ from griffin.choices import EntityType
 from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY, REDIS_HOST, REDIS_PORT, REDIS_DB, GRIFFIN_CACHE_TTL
 from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
     VaultConnectivityException
-from utils import get_keypath_from_input, get_hashicorp_url_based_on_env, construct_cache_key
+from griffin.utils import get_keypath_from_input, get_hashicorp_url_based_on_env, construct_cache_key
 
 LOGGER = logging.getLogger("secret_management_util")
 
