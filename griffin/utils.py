@@ -14,5 +14,4 @@ def get_hashicorp_url_based_on_env():
 
 
 def construct_cache_key(secret_key):
-    return str(GRIFFIN_CACHE_NAMESPACE + "::" + secret_key)
-    # return str(GRIFFIN_CACHE_NAMESPACE + "::" + ENTITY_NAME + "::" + ENV + "::" + REGION + "::" + SERVICE_NAME + "::" + secret_key)
+    return str(GRIFFIN_CACHE_NAMESPACE + "::" + ENTITY_NAME + "::" + ENV + "::" + REGION + "::" + SERVICE_NAME + "::" + secret_key)

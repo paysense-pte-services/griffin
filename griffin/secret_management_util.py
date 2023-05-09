@@ -50,7 +50,7 @@ class SecretManagementUtil:
             raise VaultConnectivityException(msg)
 
     def get_secret(self, secret_key):
-        # self._validate_values_from_input()
+        self._validate_values_from_input()
         try:
             secret = self.get_secret_from_cache(secret_key)
             return secret
@@ -95,13 +95,12 @@ class SecretManagementUtil:
 
     def warm_up_cache(self, secret_keys):
         try:
-            # vault_client = self.vault_client()
+            vault_client = self.vault_client()
             for secret_key in secret_keys:
-                # keypath = get_keypath_from_input(secret_key)
-                # secret_response = (
-                #     vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
-                # secret_value = secret_response["data"]["data"][KEY]
-                secret_value = '#ksf-principal-and-interest-report-sbox'
+                keypath = get_keypath_from_input(secret_key)
+                secret_response = (
+                    vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
+                secret_value = secret_response["data"]["data"][KEY]
                 cache_key = construct_cache_key(secret_key)
                 self.cache[cache_key] = secret_value
         except Exception as e:
