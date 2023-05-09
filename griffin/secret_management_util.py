@@ -2,10 +2,10 @@ import logging
 import hvac
 from griffin.decorators import singleton
 from griffin.choices import EntityType
-from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY
+from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY, HASHICORP_URL
 from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
     VaultConnectivityException, CacheWarmUpFailedException
-from griffin.utils import get_keypath_from_input, get_hashicorp_url_based_on_env, construct_cache_key
+from griffin.utils import get_keypath_from_input, construct_cache_key
 
 
 LOGGER = logging.getLogger("secret_management_util")
@@ -32,25 +32,21 @@ class SecretManagementUtil:
     @staticmethod
     def vault_client():
         try:
-            hashicorp_url = get_hashicorp_url_based_on_env()
             vault_client = hvac.Client(
-                url=hashicorp_url,
+                url=HASHICORP_URL,
                 token=VAULT_TOKEN,
             )
-
             if vault_client.is_authenticated():
-                LOGGER.info("Vault authentication successful for service:{}".format(SERVICE_NAME))
+                LOGGER.info(f"Vault authentication successful for service:{SERVICE_NAME}")
                 return vault_client
             else:
                 raise VaultAuthenticationException("Vault authentication failed.")
         except Exception as e:
-            msg = "Failed to connect to vault for service: {service} with error:{e}".format(
-                service=SERVICE_NAME, e=str(e)
-            )
+            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error:{str(e)}"
             LOGGER.exception(msg)
             raise VaultConnectivityException(msg)
 
-    def get_secret(self, secret_key):
+    def get_secret_value(self, secret_key):
         self._validate_values_from_input()
         try:
             secret = self.get_secret_from_cache(secret_key)
@@ -66,9 +62,7 @@ class SecretManagementUtil:
             self.set_secret_to_cache(secret_key, secret)
             return secret
         except Exception as e:
-            msg = "Failed to fetch secret for service: {service} having secret_key: {secret_key} with error:{e}".format(
-                service=SERVICE_NAME, secret_key=secret_key, e=str(e)
-            )
+            msg = f"Failed to fetch secret for service: {SERVICE_NAME} having secret_key: {secret_key} with error:{str(e)}"
             LOGGER.exception(msg)
             raise SecretNotFoundException(msg)
 

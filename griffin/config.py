@@ -13,8 +13,7 @@ MOUNT_POINT = "payu"
 AWS_INSTANCE = "ec2"
 # vault token
 VAULT_TOKEN = os.environ.get("VAULT_TOKEN")
-HASHICORP_URL_SBOX = "https://hvault-common-cluster.payufin.io"
-HASHICORP_URL_PROD = "https://hvault-common-cluster.payufin.io"
+HASHICORP_URL = os.environ.get("HASHICORP_URL")
 
 # Griffin
 GRIFFIN_CACHE_NAMESPACE = "griffin"
