@@ -20,6 +20,7 @@ class SecretManagementUtil:
 
     def __init__(self):
         self.cache = {}
+        self.vault_client = self.vault_client()
 
     @staticmethod
     def _validate_values_from_input():
@@ -72,9 +73,8 @@ class SecretManagementUtil:
             raise SecretNotFoundException(msg)
 
     def get_secret_from_vault(self, secret_key):
-        vault_client = self.vault_client()
         keypath = get_keypath_from_input(secret_key)
-        secret_response = (vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
+        secret_response = (self.vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
         return secret_response["data"]["data"][KEY]
 
     def get_secret_from_cache(self, secret_key):
@@ -95,14 +95,10 @@ class SecretManagementUtil:
 
     def warm_up_cache(self, secret_keys):
         try:
-            vault_client = self.vault_client()
             for secret_key in secret_keys:
-                keypath = get_keypath_from_input(secret_key)
-                secret_response = (
-                    vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
-                secret_value = secret_response["data"]["data"][KEY]
                 cache_key = construct_cache_key(secret_key)
-                self.cache[cache_key] = secret_value
+                if cache_key not in self.cache.keys():
+                    self.cache[cache_key] = self.get_secret_from_vault(secret_key)
         except Exception as e:
             msg = f"Cache warm up failed for service {SERVICE_NAME} with exception {str(e)}"
             LOGGER.error(msg)
