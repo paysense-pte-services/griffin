@@ -1,12 +1,12 @@
 import logging
 import hvac
-import redis
 from griffin.decorators import singleton
 from griffin.choices import EntityType
-from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY, REDIS_HOST, REDIS_PORT, REDIS_DB, GRIFFIN_CACHE_TTL
+from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY
 from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
-    VaultConnectivityException
+    VaultConnectivityException, CacheWarmUpFailedException
 from griffin.utils import get_keypath_from_input, get_hashicorp_url_based_on_env, construct_cache_key
+
 
 LOGGER = logging.getLogger("secret_management_util")
 
@@ -19,7 +19,7 @@ class SecretManagementUtil:
     """
 
     def __init__(self):
-        self.redis_connection = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+        self.cache = {}
 
     @staticmethod
     def _validate_values_from_input():
@@ -47,7 +47,7 @@ class SecretManagementUtil:
                 service=SERVICE_NAME, e=str(e)
             )
             LOGGER.exception(msg)
-            raise VaultConnectivityException(e)
+            raise VaultConnectivityException(msg)
 
     def get_secret(self, secret_key):
         self._validate_values_from_input()
@@ -61,6 +61,7 @@ class SecretManagementUtil:
 
         try:
             secret = self.get_secret_from_vault(secret_key)
+            LOGGER.info(f'Secret Value fetched from vault for secret key {secret_key}')
             self.set_secret_to_cache(secret_key, secret)
             return secret
         except Exception as e:
@@ -78,15 +79,33 @@ class SecretManagementUtil:
 
     def get_secret_from_cache(self, secret_key):
         cache_key = construct_cache_key(secret_key)
-        cache_value = self.redis_connection.get(cache_key)
+        cache_value = self.cache.get(cache_key)
         if cache_value is None:
             raise SecretNotFoundException(f"Secret Unavailable in cache for secret key - {secret_key}")
-        return cache_value.decode("utf-8")
+        LOGGER.info(f'Secret Value fetched from cache for secret key {secret_key}')
+        return cache_value
 
     def set_secret_to_cache(self, key, value):
         cache_key = construct_cache_key(key)
         try:
-            self.redis_connection.set(cache_key, value)
-            self.redis_connection.expire(cache_key, GRIFFIN_CACHE_TTL)
+            self.cache[cache_key] = value
         except Exception as e:
             LOGGER.error(f"Failed to set cache value for cache key {cache_key} - {str(e)}")
+        LOGGER.info(f"Successfully set cache for secret key {key}")
+
+    def warm_up_cache(self, secret_keys):
+        try:
+            vault_client = self.vault_client()
+            for secret_key in secret_keys:
+                keypath = get_keypath_from_input(secret_key)
+                secret_response = (
+                    vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
+                secret_value = secret_response["data"]["data"][KEY]
+                cache_key = construct_cache_key(secret_key)
+                self.cache[cache_key] = secret_value
+        except Exception as e:
+            msg = f"Cache warm up failed for service {SERVICE_NAME} with exception {str(e)}"
+            LOGGER.error(msg)
+            raise CacheWarmUpFailedException(msg)
+        LOGGER.info(f'Successfully warmed up cache for service {SERVICE_NAME}')
+
