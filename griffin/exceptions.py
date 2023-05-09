@@ -12,3 +12,7 @@ class SecretNotFoundException(Exception):
 
 class ValidationFailedException(Exception):
     pass
+
+
+class CacheWarmUpFailedException(Exception):
+    pass
