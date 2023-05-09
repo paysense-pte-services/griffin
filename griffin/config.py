@@ -2,12 +2,10 @@ import os
 
 #Vault
 # entity name can be payufin/paysense/paysense-pte/lazypay/lazycard
-os.environ["ENTITY_NAME"] = "paysense-pte" #todo
 ENTITY_NAME = os.environ.get("ENTITY_NAME")
 # env can be prod/sbox
 ENV = os.environ.get("ENV", "sbox")
 REGION = os.environ.get("REGION", "ap-south-1")
-os.environ["SERVICE_NAME"] = "payment" #todo
 SERVICE_NAME = "payment"
 KEY = "current"
 MOUNT_POINT = "payu"
