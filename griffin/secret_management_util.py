@@ -93,6 +93,13 @@ class SecretManagementUtil:
             LOGGER.error(f"Failed to set cache value for cache key {cache_key} - {str(e)}")
         LOGGER.info(f"Successfully set cache for secret key {key}")
 
+    def delete_secret_from_cache(self, key):
+        cache_key = construct_cache_key(key)
+        try:
+            self.cache.pop(cache_key)
+        except Exception as e:
+            LOGGER.error(f"Failed to delete cache key {cache_key} - {str(e)}")
+
     def warm_up_cache(self, secret_keys):
         try:
             for secret_key in secret_keys:
