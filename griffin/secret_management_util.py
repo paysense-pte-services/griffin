@@ -22,7 +22,6 @@ class SecretManagementUtil:
         self.cache = {}
         self.vault_client = self.vault_client()
 
-    @staticmethod
     def _validate_values_from_input():
         if not (ENTITY_NAME and SERVICE_NAME):
             raise ValidationFailedException("Validation failed. Entity Name or Service Name not present. Please pass required values")
@@ -54,6 +53,7 @@ class SecretManagementUtil:
             pass
         except Exception as e:
             LOGGER.error(f"Exception occurred while getting secret from cache - {str(e)}")
+            LOGGER.exception(e)
 
         try:
             secret = self.get_secret_from_vault(secret_key)
