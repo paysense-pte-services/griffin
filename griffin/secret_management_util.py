@@ -1,11 +1,13 @@
 import logging
 import hvac
+import traceback
 from griffin.decorators import singleton
 from griffin.choices import EntityType
 from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY, HASHICORP_URL
 from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
     VaultConnectivityException, CacheWarmUpFailedException
 from griffin.utils import get_keypath_from_input, construct_cache_key
+
 
 
 LOGGER = logging.getLogger("secret_management_util")
@@ -38,9 +40,9 @@ class SecretManagementUtil:
                 LOGGER.info(f"Vault authentication successful for service:{SERVICE_NAME}")
                 return vault_client
             else:
-                raise VaultAuthenticationException("Vault authentication failed.")
+                raise VaultAuthenticationException(f"Vault authentication failed. Stack trace {traceback.format_exc()}")
         except Exception as e:
-            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error:{str(e)}"
+            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error:{str(e), url:{HASHICORP_URL}, token:{VAULT_TOKEN}}"
             LOGGER.exception(msg)
             raise VaultConnectivityException(msg)
 
