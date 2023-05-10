@@ -22,13 +22,13 @@ class SecretManagementUtil:
         self.cache = {}
         self.vault_client = self.vault_client()
 
-    def _validate_values_from_input():
+    def _validate_values_from_input(self):
         if not (ENTITY_NAME and SERVICE_NAME):
             raise ValidationFailedException("Validation failed. Entity Name or Service Name not present. Please pass required values")
         if ENTITY_NAME not in (EntityType.PAYUFIN.value, EntityType.PAYSENSE.value, EntityType.PAYSENSE_PTE.value, EntityType.LAZYPAY.value, EntityType.LAZYCARD.value):
             raise ValidationFailedException("Validation failed. Entity Name does not belongs to valid Enum. Please pass correct value.")
 
-    def vault_client():
+    def vault_client(self):
         try:
             vault_client = hvac.Client(
                 url=HASHICORP_URL,
