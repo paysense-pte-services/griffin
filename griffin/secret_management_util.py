@@ -42,7 +42,7 @@ class SecretManagementUtil:
             else:
                 raise VaultAuthenticationException(f"Vault authentication failed. Stack trace {traceback.format_exc()}")
         except Exception as e:
-            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error:{str(e), url:{HASHICORP_URL}, token:{VAULT_TOKEN}}"
+            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error: {str(e)}, url: {HASHICORP_URL}, token: {VAULT_TOKEN}"
             LOGGER.exception(msg)
             raise VaultConnectivityException(msg)
 
