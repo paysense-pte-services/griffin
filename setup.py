@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='griffin',
-    version='1.3',
+    version='1.4',
     description='Secret Management Library',
     url='https://github.com/paysense-pte-services/griffin',
     author='Supritha Krishnappa, Ritik Jain',
