@@ -29,7 +29,6 @@ class SecretManagementUtil:
         if ENTITY_NAME not in (EntityType.PAYUFIN.value, EntityType.PAYSENSE.value, EntityType.PAYSENSE_PTE.value, EntityType.LAZYPAY.value, EntityType.LAZYCARD.value):
             raise ValidationFailedException("Validation failed. Entity Name does not belongs to valid Enum. Please pass correct value.")
 
-    @staticmethod
     def vault_client():
         try:
             vault_client = hvac.Client(
