@@ -68,7 +68,7 @@ class SecretManagementUtil:
 
     def get_secret_from_vault(self, secret_key):
         vault_client = self.vault_client()
-        keypath = get_keypath_from_input(secret_key)
+        #keypath = get_keypath_from_input(secret_key)
         return "ok"
         # secret_response = (vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
         # return secret_response["data"]["data"][KEY]
