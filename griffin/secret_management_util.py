@@ -21,7 +21,6 @@ class SecretManagementUtil:
 
     def __init__(self):
         self.cache = {}
-        self.vault_client = self.vault_client()
 
     def _validate_values_from_input(self):
         if not (ENTITY_NAME and SERVICE_NAME):
@@ -67,8 +66,9 @@ class SecretManagementUtil:
             raise SecretNotFoundException(msg)
 
     def get_secret_from_vault(self, secret_key):
+        vault_client = self.vault_client()
         keypath = get_keypath_from_input(secret_key)
-        secret_response = (self.vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
+        secret_response = (vault_client.secrets.kv.v2.read_secret_version(path=keypath, mount_point=MOUNT_POINT))
         return secret_response["data"]["data"][KEY]
 
     def get_secret_from_cache(self, secret_key):
