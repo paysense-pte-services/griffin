@@ -46,7 +46,7 @@ class SecretManagementUtil:
             # raise VaultConnectivityException(msg)
 
     def get_secret_value(self, secret_key):
-        self._validate_values_from_input()
+        #self._validate_values_from_input()
         try:
             secret = self.get_secret_from_cache(secret_key)
             return secret
