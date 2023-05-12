@@ -26,7 +26,7 @@ class SecretManagementUtil:
         if not (ENTITY_NAME and SERVICE_NAME):
             raise ValidationFailedException("Validation failed. Entity Name or Service Name not present. Please pass required values")
         if ENTITY_NAME not in (EntityType.PAYUFIN.value, EntityType.PAYSENSE.value, EntityType.PAYSENSE_PTE.value, EntityType.LAZYPAY.value, EntityType.LAZYCARD.value):
-            raise ValidationFailedException("Validation failed. Entity Name does not belongs to valid Enum. Please pass correct value.")
+            raise ValidationFailedException("Validation failed. Entity Name does not belong to valid Enum. Please pass correct value.")
 
     def vault_client(self):
         try:
@@ -40,7 +40,7 @@ class SecretManagementUtil:
             else:
                 raise VaultAuthenticationException("Vault authentication failed")
         except Exception as e:
-            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with url: {HASHICORP_URL} and token: {VAULT_TOKEN} with error: {str(e)}"
+            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error: {str(e)}"
             LOGGER.exception(msg)
             raise VaultConnectivityException(msg)
 

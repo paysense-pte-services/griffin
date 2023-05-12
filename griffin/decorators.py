@@ -1,7 +1,7 @@
 import logging
 import time
 
-LOGGER = logging.getLogger("griffin_decorators")
+LOGGER = logging.getLogger('')
 
 
 def singleton(cls):
