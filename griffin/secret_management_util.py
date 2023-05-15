@@ -1,12 +1,11 @@
 import logging
 import hvac
-from griffin.decorators import singleton
+from griffin.decorators import singleton, timed
 from griffin.choices import EntityType
 from griffin.config import ENTITY_NAME, SERVICE_NAME, VAULT_TOKEN, MOUNT_POINT, KEY, HASHICORP_URL
 from griffin.exceptions import VaultAuthenticationException, SecretNotFoundException, ValidationFailedException, \
     VaultConnectivityException, CacheWarmUpFailedException
 from griffin.utils import get_keypath_from_input, construct_cache_key
-
 
 
 LOGGER = logging.getLogger("secret_management_util")
@@ -27,7 +26,7 @@ class SecretManagementUtil:
         if not (ENTITY_NAME and SERVICE_NAME):
             raise ValidationFailedException("Validation failed. Entity Name or Service Name not present. Please pass required values")
         if ENTITY_NAME not in (EntityType.PAYUFIN.value, EntityType.PAYSENSE.value, EntityType.PAYSENSE_PTE.value, EntityType.LAZYPAY.value, EntityType.LAZYCARD.value):
-            raise ValidationFailedException("Validation failed. Entity Name does not belongs to valid Enum. Please pass correct value.")
+            raise ValidationFailedException("Validation failed. Entity Name does not belong to valid Enum. Please pass correct value.")
 
     def vault_client(self):
         try:
@@ -41,10 +40,11 @@ class SecretManagementUtil:
             else:
                 raise VaultAuthenticationException("Vault authentication failed")
         except Exception as e:
-            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with url: {HASHICORP_URL} and token: {VAULT_TOKEN} with error: {str(e)}"
+            msg = f"Failed to connect to vault for service: {SERVICE_NAME} with error: {str(e)}"
             LOGGER.exception(msg)
             raise VaultConnectivityException(msg)
 
+    @timed
     def get_secret_value(self, secret_key):
         self._validate_values_from_input()
         try:
@@ -94,6 +94,7 @@ class SecretManagementUtil:
         except Exception as e:
             LOGGER.error(f"Failed to delete cache key {cache_key} - {str(e)}")
 
+    @timed
     def warm_up_cache(self, secret_keys):
         try:
             for secret_key in secret_keys:
