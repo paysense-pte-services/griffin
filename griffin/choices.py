@@ -7,3 +7,4 @@ class EntityType(Enum):
     PAYSENSE_PTE = "paysense-pte"
     LAZYPAY = "lazypay"
     LAZYCARD = "lazycard"
+    DS_DATA_SMS = "ds-data-sms"
