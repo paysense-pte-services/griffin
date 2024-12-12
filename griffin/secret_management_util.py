@@ -58,9 +58,7 @@ class SecretManagementUtil:
                 token=VAULT_TOKEN,
             )
             if vault_client.is_authenticated():
-                LOGGER.info(
-                    f"Vault authentication successful for service:{SERVICE_NAME}"
-                )
+                LOGGER.info(f"Vault authentication successful for service:{SERVICE_NAME}")
                 return vault_client
             else:
                 raise VaultAuthenticationException("Vault authentication failed")
@@ -78,9 +76,7 @@ class SecretManagementUtil:
         except SecretNotFoundException:
             pass
         except Exception as e:
-            LOGGER.error(
-                f"Exception occurred while getting secret from cache - {str(e)}"
-            )
+            LOGGER.error(f"Exception occurred while getting secret from cache - {str(e)}")
             LOGGER.exception(e)
 
         try:
@@ -104,9 +100,7 @@ class SecretManagementUtil:
         cache_key = construct_cache_key(secret_key)
         cache_value = self.cache.get(cache_key)
         if cache_value is None:
-            raise SecretNotFoundException(
-                f"Secret Unavailable in cache for secret key - {secret_key}"
-            )
+            raise SecretNotFoundException(f"Secret Unavailable in cache for secret key - {secret_key}")
         LOGGER.info(f"Secret Value fetched from cache for secret key {secret_key}")
         return cache_value
 
@@ -115,9 +109,7 @@ class SecretManagementUtil:
         try:
             self.cache[cache_key] = value
         except Exception as e:
-            LOGGER.error(
-                f"Failed to set cache value for cache key {cache_key} - {str(e)}"
-            )
+            LOGGER.error(f"Failed to set cache value for cache key {cache_key} - {str(e)}")
         LOGGER.info(f"Successfully set cache for secret key {key}")
 
     def delete_secret_from_cache(self, key):

@@ -10,17 +10,7 @@ from griffin.config import (
 
 def get_keypath_from_input(secret_key):
     return str(
-        AWS_INSTANCE
-        + "/"
-        + ENTITY_NAME
-        + "/"
-        + ENV
-        + "/"
-        + REGION
-        + "/"
-        + SERVICE_NAME
-        + "/"
-        + secret_key
+        AWS_INSTANCE + "/" + ENTITY_NAME + "/" + ENV + "/" + REGION + "/" + SERVICE_NAME + "/" + secret_key
     )
 
 
