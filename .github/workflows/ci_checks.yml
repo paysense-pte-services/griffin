@@ -11,30 +11,20 @@ concurrency:
    cancel-in-progress: true
 
 jobs:
-  initial_checks:
-    name: Black formatting & Secrets Scan
-    runs-on: ubuntu-20.04
+  black-formatting:
+    name: Black Formatter
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11.0'
-      - name: Run scan
-        id: trivy-scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'repo'
-          scan-ref: '.'
-          format: 'table'
-          exit-code: 1
-          ignore-unfixed: true
-          vuln-type: 'library,os'
-          severity: 'CRITICAL,HIGH,MEDIUM'
-          scanners: secret
+          python-version: '3.11'
+      - run: pip install black==24.3.0
+      - run: black . --check  --config pyproject.toml
   sonarqube:
     name: Sonarqube scan
     runs-on: ubuntu-20.04
-    needs: [initial_checks]
+    needs: black-formatting
     steps:
       - name: Setup checkout
         uses: actions/checkout@v4
