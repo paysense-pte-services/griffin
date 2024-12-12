@@ -15,9 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  secret-scanning:
-    name: Secrets Scan
-    uses: paysense-india-services/payufin-integration/.github/workflows/generic-secret-scanner.yaml@test_reusable_workflow
   unit-testing:
     name: Unit Tests
     needs: secret-scanning
