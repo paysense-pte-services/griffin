@@ -1,0 +1,10 @@
+name: "Relaxed quality gate JIRA integration"
+on:
+  pull_request:
+    branches: ['master']
+    types: [ closed ]
+jobs:
+  relaxed-quality-gate-jira-integration:
+    uses: paysense-india-services/payufin-integration/.github/workflows/generic-relaxed-quality-gate-jira-integration.yaml@release-java-21
+    with:
+      sonar_project_key: "paysense-pte-services_griffin"

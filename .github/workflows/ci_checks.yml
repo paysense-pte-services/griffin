@@ -1,0 +1,115 @@
+name: Continuous-Integration
+env:
+  PYTHON_VERSION: '3.11'
+  COVERAGE_FILE_PATH: /home/runner/work/griffin/griffin/coverage.xml
+
+on:
+  push:
+    branches:
+      - master # or the name of your main branch
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  label-check:
+    name: SonarQube Relaxed Quality Label Check
+    uses: paysense-india-services/payufin-integration/.github/workflows/generic-relaxed-quality-gate-label-check-flow.yaml@release-java-21
+  secret-scanning:
+    name: Secrets Scan
+    uses: paysense-india-services/payufin-integration/.github/workflows/generic-secret-scanner.yaml@test_reusable_workflow
+  unit-testing:
+    name: Unit Tests
+    needs: secret-scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: branch-checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get clean
+          sudo apt-get install libssl-dev libcurl4-openssl-dev python3 libxmlsec1-dev pkg-config
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: Install redis
+        run: |
+          sudo apt-get install -y redis-tools redis-server
+          redis-cli ping
+      - name: Run tests
+        env:
+          DJANGO_SETTINGS_MODULE: griffin.config
+        run: tox -e py
+      - name: Override Coverage Source Path for Sonar
+        run: |
+          sed -i "s/<source>\/home\/runner\/work\/griffin\/griffin<\/source>/<source>\/github\/workspace<\/source>/g" ${{ env.COVERAGE_FILE_PATH }}
+      - name: Archive coverage file for sonar scan
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-file
+          path: ${{ env.COVERAGE_FILE_PATH }}
+          retention-days: 1
+  sonar_scan:
+    name: Sonar Quality Gate
+    needs: unit-testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: branch-checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Get coverage file
+        id: get-archived-coverage-report
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-file
+      - name: Download label check output
+        uses: actions/download-artifact@v4
+        with:
+          name: label-check-output
+      - name: read label variable
+        run: |
+          # Read the uploaded output file
+          output=$(cat output.txt)
+          echo "$output" | grep 'relax-quality-gate' > result.txt
+          echo "HAS_RELAX_QUALITY_GATE_LABEL=$(cat result.txt | cut -d '=' -f 2)" >> $GITHUB_ENV
+          echo "Relax quality gate value ${{ env.HAS_RELAX_QUALITY_GATE_LABEL}}"
+      - if: ${{env.HAS_RELAX_QUALITY_GATE_LABEL != 'true'}}
+        name: Run sonar scan
+        id: sonar-scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.exclusions=**/tests/**,**/migrations/**,**/management/**,**/deployment/**,**/deployment_config/**,**/scripts/**,**/*.json
+      - if: ${{env.HAS_RELAX_QUALITY_GATE_LABEL != 'true'}}
+        name: Sonar quality gate
+        id: sonar-quality-gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - if: ${{ env.HAS_RELAX_QUALITY_GATE_LABEL == 'true'}}
+        name: skip_quality_gate
+        run: |
+          echo "Relax quality gate value ${{ env.HAS_RELAX_QUALITY_GATE_LABEL}}, Skip sonar quality gate"
