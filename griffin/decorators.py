@@ -1,7 +1,7 @@
 import logging
 import time
 
-LOGGER = logging.getLogger('')
+LOGGER = logging.getLogger("")
 
 
 def singleton(cls):
@@ -26,7 +26,9 @@ def timed(method):
         ts = time.time()
         result = method(*args, **kwargs)
         te = time.time()
-        LOGGER.info("({}.{}) took {:.2f}s".format(
-            method.__module__, method.__name__, te - ts))
+        LOGGER.info(
+            "({}.{}) took {:.2f}s".format(method.__module__, method.__name__, te - ts)
+        )
         return result
+
     return _timed

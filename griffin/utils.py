@@ -1,9 +1,40 @@
-from griffin.config import AWS_INSTANCE, ENTITY_NAME, ENV, REGION, SERVICE_NAME, GRIFFIN_CACHE_NAMESPACE
+from griffin.config import (
+    AWS_INSTANCE,
+    ENTITY_NAME,
+    ENV,
+    REGION,
+    SERVICE_NAME,
+    GRIFFIN_CACHE_NAMESPACE,
+)
 
 
 def get_keypath_from_input(secret_key):
-    return str(AWS_INSTANCE + "/" + ENTITY_NAME + "/" + ENV + "/" + REGION + "/" + SERVICE_NAME + "/" + secret_key)
+    return str(
+        AWS_INSTANCE
+        + "/"
+        + ENTITY_NAME
+        + "/"
+        + ENV
+        + "/"
+        + REGION
+        + "/"
+        + SERVICE_NAME
+        + "/"
+        + secret_key
+    )
 
 
 def construct_cache_key(secret_key):
-    return str(GRIFFIN_CACHE_NAMESPACE + "::" + ENTITY_NAME + "::" + ENV + "::" + REGION + "::" + SERVICE_NAME + "::" + secret_key)
+    return str(
+        GRIFFIN_CACHE_NAMESPACE
+        + "::"
+        + ENTITY_NAME
+        + "::"
+        + ENV
+        + "::"
+        + REGION
+        + "::"
+        + SERVICE_NAME
+        + "::"
+        + secret_key
+    )

@@ -1,6 +1,6 @@
 import os
 
-#Vault
+# Vault
 # entity name can be payufin/paysense/paysense-pte/lazypay/lazycard
 ENTITY_NAME = os.environ.get("ENTITY_NAME")
 # env can be prod/sbox
