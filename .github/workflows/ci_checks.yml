@@ -17,7 +17,6 @@ concurrency:
 jobs:
   unit-testing:
     name: Unit Tests
-    needs: secret-scanning
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
