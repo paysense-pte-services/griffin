@@ -28,7 +28,7 @@ jobs:
   sonarqube:
     name: Sonarqube scan
     runs-on: ubuntu-20.04
-    needs: secret-scan
+    needs: black-formatting
     steps:
       - name: Setup checkout
         uses: actions/checkout@v4
