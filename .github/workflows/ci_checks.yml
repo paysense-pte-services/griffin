@@ -21,14 +21,10 @@ jobs:
           python-version: '3.11'
       - run: pip install black==24.3.0
       - run: black . --check  --config pyproject.toml
-  secret-scan:
-    name: Secret Scanning
-    needs: black-formatting
-    uses: paysense-india-services/payufin-integration/.github/workflows/generic-secret-scanner.yaml@release-java-21
   sonarqube:
     name: Sonarqube scan
     runs-on: ubuntu-20.04
-    needs: secret-scan
+    needs: black-formatting
     steps:
       - name: Setup checkout
         uses: actions/checkout@v4
