@@ -1,0 +1,49 @@
+name: Continuous Integration checks
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+concurrency:
+   group: ${{ github.workflow }}-${{ github.ref }}
+   cancel-in-progress: true
+
+jobs:
+  black-formatting:
+    name: Black Formatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install black==24.3.0
+      - run: black . --check  --config pyproject.toml
+  sonarqube:
+    name: Sonarqube scan
+    runs-on: ubuntu-20.04
+    needs: black-formatting
+    steps:
+      - name: Setup checkout
+        uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.0'
+      - name: sonarqube scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.internal.analysis.dbd=false
+            -Dsonar.python.version=3.11
+      - name: Sonar quality gate
+        id: sonar-quality-gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
