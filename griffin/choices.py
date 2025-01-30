@@ -8,4 +8,4 @@ class EntityType(Enum):
     LAZYPAY = "lazypay"
     LAZYCARD = "lazycard"
     DS_DATA_SMS = "ds-data-sms"
-    UAT_DATA_SMS = "uat-data-sms"
+    UAT_SMS = "uat-sms"

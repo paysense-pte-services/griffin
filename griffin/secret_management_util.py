@@ -46,7 +46,7 @@ class SecretManagementUtil:
             EntityType.LAZYPAY.value,
             EntityType.LAZYCARD.value,
             EntityType.DS_DATA_SMS.value,
-            EntityType.UAT_DATA_SMS.value,
+            EntityType.UAT_SMS.value,
         ):
             raise ValidationFailedException(
                 "Validation failed. Entity Name does not belong to valid Enum. Please pass correct value."
