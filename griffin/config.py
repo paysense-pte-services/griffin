@@ -5,7 +5,7 @@ import os
 ENTITY_NAME = os.environ.get("ENTITY_NAME")
 # env can be prod/sbox
 ENV = os.environ.get("ENV", "sbox")
-REGION = os.environ.get("REGION", "ap-south-1")
+REGION = os.environ.get("VAULT_REGION", "ap-south-1")
 SERVICE_NAME = os.environ.get("SERVICE_NAME")
 KEY = "current"
 MOUNT_POINT = "payu"
